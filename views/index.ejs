@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title><%= pub.title %> - Seeeshow</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <h1><%= pub.title %></h1>
+    <p><%= pub.content %></p>
+
+    <form id="nextForm" method="POST" action="/next" onsubmit="handleNext(event)">
+      <input type="hidden" name="user" value="<%= user %>">
+      <input type="hidden" name="filename" value="<%= filename %>">
+      <input type="hidden" name="redirectUrl" value="<%= pub.redirectUrl %>">
+      <button type="submit">👁️ Ver próximo</button>
+    </form>
+
+    <div class="info">
+      <p>Usuário: <strong><%= user %></strong></p>
+      <p>Pontos disponíveis: <strong><%= points %></strong></p>
+      <p><a href="/publish?user=<%= user %>">Publicar algo 📤</a></p>
+    </div>
+  </main>
+
+  <script>
+    function handleNext(event) {
+      event.preventDefault();
+
+      const form = document.getElementById('nextForm');
+      const redirectUrl = form.redirectUrl.value;
+
+      // Abre o link da publicação numa nova aba
+      window.open(redirectUrl, '_blank');
+
+      // Envia a requisição para o backend para contar o ponto e remover a pub
+      fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(form))
+      }).then(() => {
+        // Após registrar a view, recarrega a página com nova publicação
+        window.location.reload();
+      });
+    }
+  </script>
+</body>
+</html>
